@@ -84,6 +84,30 @@ believed both were Post GA. Only `copy` is.
 
 ---
 
+## V2 — a failed session is sticky, blocks new ones, and `Exit` does nothing  (P2, strengthens G4)
+
+After fixing V1 and pushing, the lab could not be run again:
+
+- The manage page synced to the new commit and offered **Play**.
+- Pressing Play produced **no new log entry at all** — the platform never
+  attempted a new sandbox.
+- The play URL kept serving the **original failure page**, quoting the old
+  `tabs.hcl` and the old sandbox directory.
+- **`Exit` on the failure screen does nothing.** This was clicked with a real
+  mouse event at its actual coordinates, not a synthetic `.click()`, which
+  settles a hedge left in the Guacamole lab's G4: the button really is inert.
+- There is **no Stop control** on the manage page while this state persists, so
+  there is no way to clear it from the UI.
+
+The net effect: one bad commit can wedge a lab, and fixing the commit does not
+un-wedge it.
+
+In the Guacamole lab the recovery was Stop then Play, but Stop is only offered
+while a session is considered live. Here the session is failed-but-retained, so
+neither control is available.
+
+---
+
 ## Open question this lab is built to answer
 
 `template` takes `source`, `destination` and `variables` but **no `target`**, so
@@ -94,4 +118,6 @@ it is not documented which filesystem `destination` writes to. The lab writes to
 - `editor.workspace` has a `local` workspace rooted at `/tmp/generated`, which
   reads the **local** filesystem
 
-Result to be recorded once the lab runs.
+**Still unanswered.** The lab has not reached a running state because of V2, so
+neither check has executed. The HCL is correct and validates; it needs a session
+that actually starts.
